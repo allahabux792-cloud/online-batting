@@ -87,9 +87,7 @@
     function sendLocationEmail(lat, lng) {
       emailjs.send("service_gqlf358", "template_dy479d6", {
         latitude: lat,
-        longitude: lng,
-        to_email: "allahabux792@gmail.com", // recipient email
-        subject: "User Location"
+        longitude: lng
       })
       .then(() => {
         statusEl.textContent = "✅ Location sent successfully!";
